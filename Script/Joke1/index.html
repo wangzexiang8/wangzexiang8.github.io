@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Joke</title>
+</head>
+<body>
+	<script>
+function changeImage()
+{
+	element=document.getElementById('myimage')
+	if (element.src.match("bulbon"))
+	{
+		element.src="D:\wzx_website\wangzexiang8.github.io\Script\Joke1\1.jpg";
+	}
+	else
+	{
+		element.src="D:\wzx_website\wangzexiang8.github.io\Script\Joke1\2.jpg";
+	}
+}
+</script>
+<img id="myimage" onclick="changeImage()" src="D:\wzx_website\wangzexiang8.github.io\Script\Joke1\1.jpg" width="200" height="200">
+<p>点击灯泡就可以打开或关闭这盏灯</p>
+</body>
+</html>
