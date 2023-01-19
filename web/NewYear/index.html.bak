@@ -15,7 +15,7 @@
 <body>
     <div class="container-fluid">
         <h1 class="red-text text-center">Wishing You And Your Brood <br/> A Happy New Year!</h1>
-      <center><span style="font-size:16px">"µã»÷ÆÁÄ»´¥·¢ÑÌ»¨!"</span>  </center>
+      <center><span style="font-size:16px">"Tap the screen to see a magic"</span>  </center>
     </div> 
 
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
