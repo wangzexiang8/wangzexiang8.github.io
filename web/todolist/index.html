@@ -12,8 +12,10 @@
         <div class="input-container">
             <input type="text" id="new-task-input" placeholder="添加新任务">
             <button onclick="addTask()">添加任务</button>
+            <br> <!-- 添加一个空行 -->
+            <button onclick="clearAllTasks()">清除所有任务</button>
         </div>
-        <button onclick="clearAllTasks()">清除所有任务</button>
+        
         <ul id="task-list"></ul>
     </div>
     <script src="script.js"></script>
