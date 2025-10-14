@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手机系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .phone {
+            width: 375px;
+            height: 667px;
+            background: #000;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            color: #fff;
+            font-size: 12px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .home-screen {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 80px 20px 80px;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .app-icon:active {
+            transform: scale(0.9);
+        }
+
+        .icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .app-name {
+            color: #fff;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .app-view {
+            display: none;
+            height: 100%;
+            background: #f5f5f5;
+            flex-direction: column;
+            padding-top: 44px;
+        }
+
+        .app-view.active {
+            display: flex;
+        }
+
+        .app-header {
+            height: 60px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: absolute;
+            top: 44px;
+            left: 0;
+            right: 0;
+            z-index: 10;
+        }
+
+        .back-btn {
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+
+        .app-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .app-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            padding-top: 60px;
+        }
+
+        /* 电话应用 */
+        .dial-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            max-width: 300px;
+            margin: 30px auto;
+        }
+
+        .dial-number {
+            background: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+
+        .dial-number:active {
+            transform: scale(0.95);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .phone-display {
+            text-align: center;
+            font-size: 32px;
+            padding: 30px;
+            background: #fff;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .call-btn {
+            background: #34c759;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            font-size: 28px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+        }
+
+        /* 便笺应用 */
+        .note-input {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: none;
+            margin-bottom: 15px;
+        }
+
+        .note-btn {
+            background: #007aff;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .notes-list {
+            margin-top: 20px;
+        }
+
+        .note-item {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .note-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .note-text {
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* 微信应用 */
+        .chat-list {
+            background: #fff;
+            height: 100%;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+
+        .chat-item:active {
+            background: #f5f5f5;
+        }
+
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+            margin-right: 12px;
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-name {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .chat-preview {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .chat-view {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            background: #f5f5f5;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding-top: 44px;
+        }
+
+        .chat-view.active {
+            display: flex;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 15px;
+        }
+
+        .message.received .message-bubble {
+            background: #fff;
+            border-top-left-radius: 4px;
+        }
+
+        .message.sent .message-bubble {
+            background: #95ec69;
+            border-top-right-radius: 4px;
+        }
+
+        .chat-input-bar {
+            background: #f5f5f5;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 15px;
+        }
+
+        .send-btn {
+            background: #07c160;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        /* 短视频应用 */
+        #shortVideoApp {
+            padding-top: 0;
+        }
+        .video-container {
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            background: #111;
+        }
+        .video-item {
+            width: 100%;
+            height: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .video-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 15px;
+            right: 15px;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .video-info {
+            flex: 1;
+        }
+        .video-user {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .video-caption {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .video-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            margin-left: 10px;
+        }
+        .video-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .video-action-btn .icon {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        /* 短视频退出按钮 */
+        .video-exit-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .video-exit-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+            border-color: #fff;
+            transform: scale(1.1);
+        }
+
+        .video-exit-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 银龄守护应用 */
+        .elder-care-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            padding: 30px 20px;
+        }
+
+        .elder-care-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .elder-care-subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .quick-action-btn {
+            background: #fff;
+            border: 3px solid #007aff;
+            border-radius: 20px;
+            padding: 30px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,122,255,0.15);
+        }
+
+        .quick-action-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 8px rgba(0,122,255,0.2);
+        }
+
+        .quick-action-btn .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .quick-action-btn .action-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #007aff;
+            margin-bottom: 8px;
+        }
+
+        .quick-action-btn .action-subtitle {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .quick-action-btn.call-action {
+            border-color: #34c759;
+        }
+
+        .quick-action-btn.call-action .action-title {
+            color: #34c759;
+        }
+
+        .quick-action-btn.video-action {
+            border-color: #07c160;
+        }
+
+        .quick-action-btn.video-action .action-title {
+            color: #07c160;
+        }
+
+        .quick-action-btn.smart-guide-action {
+            border-color: #ff6b35;
+        }
+
+        .quick-action-btn.smart-guide-action .action-title {
+            color: #ff6b35;
+        }
+
+        /* 智慧引导样式 */
+        .smart-guide-content {
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .guide-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .guide-subtitle {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            margin-top: -10px;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .voice-input-area {
+            display: flex;
+            justify-content: center;
+        }
+
+        .voice-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 20px 40px;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            transition: all 0.3s;
+        }
+
+        .voice-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 10px rgba(255, 107, 53, 0.4);
+        }
+
+        .voice-btn.recording {
+            background: linear-gradient(135deg, #ff3b30 0%, #ff6b35 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .voice-icon {
+            font-size: 24px;
+        }
+
+        .text-divider {
+            text-align: center;
+            position: relative;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .text-divider::before,
+        .text-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: #ddd;
+        }
+
+        .text-divider::before {
+            left: 0;
+        }
+
+        .text-divider::after {
+            right: 0;
+        }
+
+        .text-input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .guide-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: none;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .guide-input:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+
+        .guide-submit-btn {
+            background: #ff6b35;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .guide-submit-btn:active {
+            transform: scale(0.97);
+            background: #f7931e;
+        }
+
+        .guide-result {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .result-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .steps-container {
+            margin-bottom: 20px;
+        }
+
+        .guide-step {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+
+        .guide-step.current {
+            border-color: #ff6b35;
+            background: #fff5f2;
+        }
+
+        .step-number {
+            background: #ff6b35;
+            color: #fff;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .step-description {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .guide-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .guide-action-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .guide-action-btn.cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .guide-action-btn.start {
+            background: #ff6b35;
+            color: #fff;
+        }
+
+        .guide-action-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* 弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            width: 280px;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .money-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .modal-hint {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .modal-btn.cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .modal-btn.confirm {
+            background: #07c160;
+            color: #fff;
+        }
+
+        .video-call-screen {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 60px 30px;
+            height: 100%;
+        }
+
+        .video-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .video-status {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .video-time {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .video-controls {
+            display: flex;
+            gap: 30px;
+        }
+
+        .video-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-btn.hangup {
+            background: #ff3b30;
+            color: #fff;
+        }
+
+        .video-btn.mute {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        .redpacket-message {
+            background: #f9e4b7;
+            border: 2px solid #e5c89d;
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 70%;
+        }
+
+        .redpacket-icon {
+            font-size: 32px;
+        }
+
+        .redpacket-info {
+            flex: 1;
+        }
+
+        .redpacket-title {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .redpacket-amount {
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>⚡ 100%</span>
+            </div>
+
+            <div class="home-screen" id="homeScreen">
+                <div class="app-grid">
+                    <div class="app-icon" onclick="openApp('phone')">
+                        <div class="icon" style="background: #34c759;">📞</div>
+                        <div class="app-name">电话</div>
+                    </div>
+                    <div class="app-icon" onclick="openApp('notes')">
+                        <div class="icon" style="background: #ffcc00;">📝</div>
+                        <div class="app-name">便笺</div>
+                    </div>
+                    <div class="app-icon" onclick="openApp('wechat')">
+                        <div class="icon" style="background: #07c160;">💬</div>
+                        <div class="app-name">微信</div>
+                    </div>
+                    <div class="app-icon" onclick="openApp('shortVideo')">
+                        <div class="icon" style="background: linear-gradient(45deg, #ff0050, #00f2ea);">🎬</div>
+                        <div class="app-name">短视频</div>
+                    </div>
+                    <div class="app-icon" onclick="openApp('elderCare')">
+                        <div class="icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">👴</div>
+                        <div class="app-name">银龄守护</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-view" id="phoneApp">
+                <div class="app-header">
+                    <span class="back-btn" onclick="backToHome()">←</span>
+                    <span class="app-title">电话</span>
+                </div>
+                <div class="app-content">
+                    <div class="phone-display" id="phoneDisplay">-</div>
+                    <div class="dial-pad">
+                        <button class="dial-number" onclick="dialNumber('1')">1</button>
+                        <button class="dial-number" onclick="dialNumber('2')">2</button>
+                        <button class="dial-number" onclick="dialNumber('3')">3</button>
+                        <button class="dial-number" onclick="dialNumber('4')">4</button>
+                        <button class="dial-number" onclick="dialNumber('5')">5</button>
+                        <button class="dial-number" onclick="dialNumber('6')">6</button>
+                        <button class="dial-number" onclick="dialNumber('7')">7</button>
+                        <button class="dial-number" onclick="dialNumber('8')">8</button>
+                        <button class="dial-number" onclick="dialNumber('9')">9</button>
+                        <button class="dial-number" onclick="dialNumber('*')">*</button>
+                        <button class="dial-number" onclick="dialNumber('0')">0</button>
+                        <button class="dial-number" onclick="dialNumber('#')">#</button>
+                    </div>
+                    <button class="call-btn" onclick="makeCall()">📞</button>
+                </div>
+            </div>
+
+            <div class="app-view" id="notesApp">
+                <div class="app-header">
+                    <span class="back-btn" onclick="backToHome()">←</span>
+                    <span class="app-title">便笺</span>
+                </div>
+                <div class="app-content">
+                    <textarea class="note-input" id="noteInput" placeholder="写点什么..."></textarea>
+                    <button class="note-btn" onclick="saveNote()">保存便笺</button>
+                    <div class="notes-list" id="notesList"></div>
+                </div>
+            </div>
+
+            <div class="app-view" id="wechatApp">
+                <div class="app-header">
+                    <span class="back-btn" onclick="backToHome()">←</span>
+                    <span class="app-title">微信</span>
+                </div>
+                <div class="app-content" style="padding: 60px 0 0;">
+                    <div class="chat-list" id="chatList"></div>
+                </div>
+            </div>
+            
+            <div class="app-view" id="shortVideoApp">
+                 <div class="app-header" style="background: rgba(0,0,0,0.5); color: white; box-shadow: none; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
+                    <span class="back-btn" onclick="backToHome()">←</span>
+                    <span class="app-title">短视频</span>
+                </div>
+                <div class="video-exit-btn" onclick="backToHome()" title="退出短视频">
+                    ✕
+                </div>
+                <div class="video-container" id="videoContainer">
+                </div>
+            </div>
+
+            <div class="app-view" id="elderCareApp">
+                <div class="app-header">
+                    <span class="back-btn" onclick="backToHome()">←</span>
+                    <span class="app-title">银龄守护</span>
+                </div>
+                <div class="app-content">
+                    <div class="elder-care-content">
+                        <div>
+                            <div class="elder-care-title">一键直达</div>
+                            <div class="elder-care-subtitle">轻松联系家人</div>
+                        </div>
+
+                        <div class="quick-action-btn call-action" onclick="quickCallSon()">
+                            <div class="icon">📱</div>
+                            <div class="action-title">一键拨号儿子</div>
+                            <div class="action-subtitle">12345678900</div>
+                        </div>
+
+                        <div class="quick-action-btn video-action" onclick="quickVideoZhangSan()">
+                            <div class="icon">📹</div>
+                            <div class="action-title">一键视频张三</div>
+                            <div class="action-subtitle">微信视频通话</div>
+                        </div>
+
+                        <div class="quick-action-btn smart-guide-action" onclick="openSmartGuide()">
+                            <div class="icon">🧠</div>
+                            <div class="action-title">智慧引导</div>
+                            <div class="action-subtitle">语音或文字描述需求</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="app-view" id="smartGuideApp">
+                <div class="app-header">
+                    <span class="back-btn" onclick="backToElderCare()">←</span>
+                    <span class="app-title">智慧引导</span>
+                </div>
+                <div class="app-content">
+                    <div class="smart-guide-content">
+                        <div class="guide-title">请告诉我您想要做什么</div>
+                        <div class="guide-subtitle">我会一步步引导您完成操作</div>
+                        
+                        <div class="input-section">
+                            <div class="voice-input-area">
+                                <button class="voice-btn" onclick="toggleVoiceInput()" id="voiceBtn">
+                                    <span class="voice-icon">🎤</span>
+                                    <span class="voice-text">点击说话</span>
+                                </button>
+                            </div>
+                            
+                            <div class="text-divider">
+                                <span>或者</span>
+                            </div>
+                            
+                            <div class="text-input-area">
+                                <textarea class="guide-input" id="guideInput" placeholder="请输入您的需求，例如：给李四发5元红包"></textarea>
+                                <button class="guide-submit-btn" onclick="processRequest()">开始引导</button>
+                            </div>
+                        </div>
+                        
+                        <div class="guide-result" id="guideResult" style="display: none;">
+                            <div class="result-title">引导步骤</div>
+                            <div class="steps-container" id="stepsContainer"></div>
+                            <div class="guide-actions">
+                                <button class="guide-action-btn cancel" onclick="resetGuide()">重新输入</button>
+                                <button class="guide-action-btn start" onclick="startGuidance()">开始执行</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-view" id="chatView">
+                <div class="app-header">
+                    <span class="back-btn" onclick="backToWechat()">←</span>
+                    <span class="app-title" id="chatTitle">聊天</span>
+                </div>
+                <div class="messages" id="messages" style="padding-top: 70px;"></div>
+                <div class="chat-input-bar">
+                    <div class="chat-actions">
+                        <button class="action-btn" onclick="showRedPacketModal()" title="发红包">🧧</button>
+                        <button class="action-btn" onclick="startVideoCall()" title="视频通话">📹</button>
+                    </div>
+                    <input type="text" class="chat-input" id="chatInput" placeholder="发送消息...">
+                    <button class="send-btn" onclick="sendMessage()">发送</button>
+                </div>
+            </div>
+
+            <div class="modal" id="redPacketModal">
+                <div class="modal-content">
+                    <div class="modal-title">发红包</div>
+                    <input type="number" class="money-input" id="moneyInput" placeholder="0.00" step="0.01" min="0.01">
+                    <div class="modal-hint">单个红包金额最低0.01元</div>
+                    <div class="modal-buttons">
+                        <button class="modal-btn cancel" onclick="closeRedPacketModal()">取消</button>
+                        <button class="modal-btn confirm" onclick="sendRedPacket()">塞钱进红包</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal" id="videoCallModal">
+                <div class="modal-content" style="width: 100%; height: 100%; border-radius: 0; padding: 0;">
+                    <div class="video-call-screen">
+                        <div></div>
+                        <div style="text-align: center;">
+                            <div class="video-avatar" id="videoAvatar">👤</div>
+                            <div class="video-status" id="videoStatus">正在呼叫...</div>
+                            <div class="video-time" id="videoTime">00:00</div>
+                        </div>
+                        <div class="video-controls">
+                            <button class="video-btn mute" onclick="toggleMute()" id="muteBtn">🔇</button>
+                            <button class="video-btn hangup" onclick="endVideoCall()">📞</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let phoneNumber = '';
+        let notes = [];
+        let currentChat = '';
+        let chatMessages = {};
+        let isMuted = true;
+        let videoTimer = null;
+        let videoSeconds = 0;
+        let isVoiceRecording = false;
+        let currentGuidanceSteps = [];
+        let currentStepIndex = 0;
+
+        // 微信联系人数据
+        const wechatContacts = [
+            { name: '张三', avatar: '👤', lastMsg: '你好,在吗?', time: '09:30' },
+            { name: '李四', avatar: '👨', lastMsg: '明天见!', time: '昨天' },
+            { name: '王五', avatar: '👩', lastMsg: '收到,谢谢!', time: '周五' },
+            { name: '赵六', avatar: '👨‍💼', lastMsg: '文件已发送', time: '周四' },
+            { name: '工作群', avatar: '👥', lastMsg: '[10条] 小李: 好的', time: '10:25' }
+        ];
+
+        // 短视频数据
+        const shortVideos = [
+            { user: '@探索者', caption: '第一条视频:探索城市的每一个角落 🏙️ #城市漫步', bg: 'linear-gradient(45deg, #f3ec78, #af4261)'},
+            { user: '@美食家', caption: '第二条视频:今天吃点什么好呢?🍣 #美食', bg: 'linear-gradient(45deg, #f093fb, #f5576c)'},
+            { user: '@旅行日记', caption: '第三条视频:远方的风景,治愈一切 🏞️ #旅行', bg: 'linear-gradient(45deg, #4facfe, #00f2fe)'},
+            { user: '@萌宠部落', caption: '第四条视频:我家猫咪的可爱瞬间 🐾 #宠物', bg: 'linear-gradient(45deg, #fa709a, #fee140)'},
+            { user: '@运动达人', caption: '第五条视频:生命在于运动!一起动起来!🏃‍♂️ #健身', bg: 'linear-gradient(45deg, #84fab0, #8fd3f4)'}
+        ];
+
+        // 初始化微信联系人列表
+        function initWechatContacts() {
+            const chatList = document.getElementById('chatList');
+            chatList.innerHTML = wechatContacts.map(contact => `
+                <div class="chat-item" onclick="openChat('${contact.name}', '${contact.avatar}')">
+                    <div class="chat-avatar">${contact.avatar}</div>
+                    <div class="chat-info">
+                        <div class="chat-name">${contact.name}</div>
+                        <div class="chat-preview">${contact.lastMsg}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 初始化短视频列表
+        function initShortVideos() {
+            const videoContainer = document.getElementById('videoContainer');
+            videoContainer.innerHTML = shortVideos.map((video, index) => `
+                <div class="video-item" style="background: ${video.bg};">
+                    <span>视频 ${index + 1}</span>
+                    <div class="video-overlay">
+                        <div class="video-info">
+                            <div class="video-user">${video.user}</div>
+                            <div class="video-caption">${video.caption}</div>
+                        </div>
+                        <div class="video-actions">
+                            <div class="video-action-btn" onclick="alert('点赞了!')">
+                                <span class="icon">❤️</span>
+                                <span>1.2w</span>
+                            </div>
+                            <div class="video-action-btn" onclick="alert('评论一下~')">
+                                <span class="icon">💬</span>
+                                <span>345</span>
+                            </div>
+                            <div class="video-action-btn" onclick="alert('分享给朋友!')">
+                                <span class="icon">🔗</span>
+                                <span>189</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 初始化页面
+        window.onload = function() {
+            initWechatContacts();
+            initShortVideos();
+        };
+
+        function openApp(appName) {
+            document.getElementById('homeScreen').style.display = 'none';
+            document.querySelectorAll('.app-view, .chat-view').forEach(v => v.classList.remove('active'));
+            document.getElementById(appName + 'App').classList.add('active');
+        }
+
+        function backToHome() {
+            document.querySelectorAll('.app-view, .chat-view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById('homeScreen').style.display = 'block';
+            phoneNumber = '';
+            document.getElementById('phoneDisplay').textContent = '-';
+        }
+
+        function dialNumber(num) {
+            phoneNumber += num;
+            document.getElementById('phoneDisplay').textContent = phoneNumber;
+        }
+
+        function makeCall() {
+            if (phoneNumber) {
+                alert('正在拨打: ' + phoneNumber);
+                phoneNumber = '';
+                document.getElementById('phoneDisplay').textContent = '-';
+            }
+        }
+
+        function saveNote() {
+            const noteText = document.getElementById('noteInput').value.trim();
+            if (noteText) {
+                const note = {
+                    text: noteText,
+                    time: new Date().toLocaleString('zh-CN')
+                };
+                notes.unshift(note);
+                document.getElementById('noteInput').value = '';
+                renderNotes();
+            }
+        }
+
+        function renderNotes() {
+            const notesList = document.getElementById('notesList');
+            notesList.innerHTML = notes.map(note => `
+                <div class="note-item">
+                    <div class="note-time">${note.time}</div>
+                    <div class="note-text">${note.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function openChat(name, avatar) {
+            currentChat = name;
+            document.getElementById('chatTitle').textContent = name;
+            document.getElementById('wechatApp').classList.remove('active');
+            document.getElementById('chatView').classList.add('active');
+            
+            if (!chatMessages[name]) {
+                const greetings = ['你好!有什么事吗?', '嗨,找我有事?', '在的,请说', '你好啊~', '有什么可以帮你的吗?'];
+                chatMessages[name] = [
+                    { type: 'received', text: greetings[Math.floor(Math.random() * greetings.length)] }
+                ];
+            }
+            renderMessages();
+        }
+
+        function backToWechat() {
+            document.getElementById('chatView').classList.remove('active');
+            document.getElementById('wechatApp').classList.add('active');
+            document.getElementById('chatInput').value = '';
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (text && currentChat) {
+                if (!chatMessages[currentChat]) {
+                    chatMessages[currentChat] = [];
+                }
+                chatMessages[currentChat].push({ type: 'sent', text: text });
+                input.value = '';
+                renderMessages();
+                
+                setTimeout(() => {
+                    const responses = ['收到!', '好的,明白了', '没问题~', '哈哈,有意思', '了解,谢谢!', '嗯嗯,我知道了', '👍', '好的好的'];
+                    chatMessages[currentChat].push({ 
+                        type: 'received', 
+                        text: responses[Math.floor(Math.random() * responses.length)]
+                    });
+                    renderMessages();
+                }, 800 + Math.random() * 1200);
+            }
+        }
+
+        function renderMessages() {
+            const messagesDiv = document.getElementById('messages');
+            const messages = chatMessages[currentChat] || [];
+            messagesDiv.innerHTML = messages.map(msg => {
+                if (msg.type === 'redpacket') {
+                    return `
+                        <div class="message sent">
+                            <div class="redpacket-message">
+                                <div class="redpacket-icon">🧧</div>
+                                <div class="redpacket-info">
+                                    <div class="redpacket-title">恭喜发财,大吉大利</div>
+                                    <div class="redpacket-amount">¥${msg.amount}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="message ${msg.type}">
+                            <div class="message-bubble">${msg.text}</div>
+                        </div>
+                    `;
+                }
+            }).join('');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showRedPacketModal() {
+            document.getElementById('redPacketModal').classList.add('active');
+            document.getElementById('moneyInput').value = '';
+        }
+
+        function closeRedPacketModal() {
+            document.getElementById('redPacketModal').classList.remove('active');
+        }
+
+        function sendRedPacket() {
+            const amount = parseFloat(document.getElementById('moneyInput').value);
+            if (amount && amount >= 0.01 && currentChat) {
+                if (!chatMessages[currentChat]) {
+                    chatMessages[currentChat] = [];
+                }
+                chatMessages[currentChat].push({ 
+                    type: 'redpacket', 
+                    amount: amount.toFixed(2)
+                });
+                closeRedPacketModal();
+                renderMessages();
+                
+                setTimeout(() => {
+                    const thanks = ['谢谢红包!😊', '哇,谢谢!🎉', '太客气了!💕', '收到啦,谢谢~', '发财发财!🧧'];
+                    alert('💰 对方已领取红包 ¥' + amount.toFixed(2));
+                    chatMessages[currentChat].push({ 
+                        type: 'received', 
+                        text: thanks[Math.floor(Math.random() * thanks.length)]
+                    });
+                    renderMessages();
+                }, 1500);
+            } else {
+                alert('请输入有效金额(最低0.01元)');
+            }
+        }
+
+        function startVideoCall() {
+            document.getElementById('videoCallModal').classList.add('active');
+            document.getElementById('videoStatus').textContent = `正在呼叫 ${currentChat}...`;
+            document.getElementById('videoTime').textContent = '00:00';
+            document.getElementById('videoAvatar').textContent = '📹';
+            videoSeconds = 0;
+            isMuted = true;
+            document.getElementById('muteBtn').textContent = '🔇';
+            
+            setTimeout(() => {
+                document.getElementById('videoStatus').textContent = `与 ${currentChat} 通话中`;
+                document.getElementById('videoAvatar').textContent = '👤';
+                videoTimer = setInterval(() => {
+                    videoSeconds++;
+                    const mins = Math.floor(videoSeconds / 60).toString().padStart(2, '0');
+                    const secs = (videoSeconds % 60).toString().padStart(2, '0');
+                    document.getElementById('videoTime').textContent = `${mins}:${secs}`;
+                }, 1000);
+            }, 2000);
+        }
+
+        function endVideoCall() {
+            document.getElementById('videoCallModal').classList.remove('active');
+            if (videoTimer) {
+                clearInterval(videoTimer);
+                videoTimer = null;
+            }
+            if (videoSeconds > 0) {
+                const mins = Math.floor(videoSeconds / 60);
+                const secs = videoSeconds % 60;
+                const duration = mins > 0 ? `${mins}分${secs}秒` : `${secs}秒`;
+                alert(`📹 视频通话已结束\n通话时长: ${duration}`);
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('muteBtn').textContent = isMuted ? '🔇' : '🔊';
+        }
+
+        // 银龄守护功能 - 一键拨号儿子
+        function quickCallSon() {
+            // 关闭银龄守护应用
+            document.getElementById('elderCareApp').classList.remove('active');
+            // 打开电话应用
+            document.getElementById('phoneApp').classList.add('active');
+            // 自动输入号码
+            phoneNumber = '12345678900';
+            document.getElementById('phoneDisplay').textContent = phoneNumber;
+            // 自动拨打
+            setTimeout(() => {
+                alert('📞 正在拨打儿子电话:\n12345678900');
+                phoneNumber = '';
+                document.getElementById('phoneDisplay').textContent = '-';
+            }, 500);
+        }
+
+        // 银龄守护功能 - 一键视频张三
+        function quickVideoZhangSan() {
+            // 关闭银龄守护应用
+            document.getElementById('elderCareApp').classList.remove('active');
+            // 打开微信应用
+            document.getElementById('wechatApp').classList.add('active');
+            // 延迟一下让用户看到微信界面
+            setTimeout(() => {
+                // 自动打开张三的聊天
+                openChat('张三', '👤');
+                // 再延迟一下自动发起视频通话
+                setTimeout(() => {
+                    startVideoCall();
+                }, 600);
+            }, 300);
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // 智慧引导功能
+        function openSmartGuide() {
+            document.getElementById('elderCareApp').classList.remove('active');
+            document.getElementById('smartGuideApp').classList.add('active');
+            resetGuide();
+        }
+
+        function backToElderCare() {
+            document.getElementById('smartGuideApp').classList.remove('active');
+            document.getElementById('elderCareApp').classList.add('active');
+            resetGuide();
+        }
+
+        function toggleVoiceInput() {
+            const voiceBtn = document.getElementById('voiceBtn');
+            const voiceText = voiceBtn.querySelector('.voice-text');
+            
+            if (!isVoiceRecording) {
+                // 开始录音
+                isVoiceRecording = true;
+                voiceBtn.classList.add('recording');
+                voiceText.textContent = '正在录音...';
+                
+                // 模拟录音过程
+                setTimeout(() => {
+                    isVoiceRecording = false;
+                    voiceBtn.classList.remove('recording');
+                    voiceText.textContent = '点击说话';
+                    
+                    // 模拟语音识别结果
+                    document.getElementById('guideInput').value = '给李四发5元红包';
+                    alert('语音识别完成！\n识别结果：给李四发5元红包');
+                }, 2000);
+            } else {
+                // 停止录音
+                isVoiceRecording = false;
+                voiceBtn.classList.remove('recording');
+                voiceText.textContent = '点击说话';
+            }
+        }
+
+        function processRequest() {
+            const input = document.getElementById('guideInput').value.trim();
+            
+            if (!input) {
+                alert('请输入您的需求或使用语音输入');
+                return;
+            }
+
+            // 检查是否是支持的功能
+            if (input.includes('李四') && input.includes('红包') && (input.includes('5') || input.includes('五'))) {
+                showRedPacketGuidance();
+            } else {
+                alert('目前不支持此功能\n\n当前仅支持：给李四发5元红包');
+            }
+        }
+
+        function showRedPacketGuidance() {
+            currentGuidanceSteps = [
+                {
+                    title: '退出银龄守护程序',
+                    description: '点击左上角的返回按钮，回到手机主界面'
+                },
+                {
+                    title: '打开微信应用',
+                    description: '在主界面找到绿色的微信图标，点击打开'
+                },
+                {
+                    title: '找到李四联系人',
+                    description: '在微信聊天列表中找到"李四"，点击进入聊天'
+                },
+                {
+                    title: '点击红包按钮',
+                    description: '在聊天界面下方找到红包图标🧧，点击它'
+                },
+                {
+                    title: '输入红包金额',
+                    description: '在弹出的红包界面中输入"5.00"'
+                },
+                {
+                    title: '发送红包',
+                    description: '点击"塞钱进红包"按钮完成发送'
+                }
+            ];
+
+            const stepsContainer = document.getElementById('stepsContainer');
+            stepsContainer.innerHTML = currentGuidanceSteps.map((step, index) => `
+                <div class="guide-step" id="step-${index}">
+                    <div class="step-number">${index + 1}</div>
+                    <div class="step-content">
+                        <div class="step-title">${step.title}</div>
+                        <div class="step-description">${step.description}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('guideResult').style.display = 'block';
+            currentStepIndex = 0;
+        }
+
+        function resetGuide() {
+            document.getElementById('guideInput').value = '';
+            document.getElementById('guideResult').style.display = 'none';
+            currentGuidanceSteps = [];
+            currentStepIndex = 0;
+            
+            // 重置语音按钮状态
+            const voiceBtn = document.getElementById('voiceBtn');
+            const voiceText = voiceBtn.querySelector('.voice-text');
+            isVoiceRecording = false;
+            voiceBtn.classList.remove('recording');
+            voiceText.textContent = '点击说话';
+        }
+
+        function startGuidance() {
+            if (currentGuidanceSteps.length === 0) return;
+            
+            alert('🧠 智慧引导开始！\n\n请按照步骤操作，我会用醒目的标记提示您。\n\n第一步：' + currentGuidanceSteps[0].title);
+            
+            // 高亮当前步骤
+            highlightCurrentStep();
+            
+            // 开始实际的引导流程
+            executeGuidanceStep(0);
+        }
+
+        function highlightCurrentStep() {
+            // 清除所有高亮
+            document.querySelectorAll('.guide-step').forEach(step => {
+                step.classList.remove('current');
+            });
+            
+            // 高亮当前步骤
+            if (currentStepIndex < currentGuidanceSteps.length) {
+                const currentStepElement = document.getElementById(`step-${currentStepIndex}`);
+                if (currentStepElement) {
+                    currentStepElement.classList.add('current');
+                }
+            }
+        }
+
+        function executeGuidanceStep(stepIndex) {
+            if (stepIndex >= currentGuidanceSteps.length) {
+                alert('🎉 引导完成！\n\n您已经成功完成了所有步骤。');
+                return;
+            }
+
+            currentStepIndex = stepIndex;
+            highlightCurrentStep();
+
+            switch(stepIndex) {
+                case 0:
+                    // 第一步：退出银龄守护程序
+                    setTimeout(() => {
+                        alert('✅ 第1步完成！\n\n现在执行第2步：打开微信应用');
+                        executeGuidanceStep(1);
+                    }, 1000);
+                    break;
+                    
+                case 1:
+                    // 第二步：自动回到主界面并高亮微信
+                    backToHome();
+                    setTimeout(() => {
+                        // 添加微信图标的闪烁效果
+                        const wechatIcon = document.querySelector('[onclick="openApp(\'wechat\')"]');
+                        if (wechatIcon) {
+                            wechatIcon.style.animation = 'pulse 1s infinite';
+                            wechatIcon.style.border = '3px solid #ff6b35';
+                            wechatIcon.style.borderRadius = '20px';
+                        }
+                        
+                        alert('✅ 第2步：请点击闪烁的微信图标');
+                        
+                        // 监听微信应用打开
+                        const originalOpenApp = window.openApp;
+                        window.openApp = function(appName) {
+                            originalOpenApp(appName);
+                            if (appName === 'wechat') {
+                                // 恢复微信图标样式
+                                if (wechatIcon) {
+                                    wechatIcon.style.animation = '';
+                                    wechatIcon.style.border = '';
+                                    wechatIcon.style.borderRadius = '';
+                                }
+                                setTimeout(() => {
+                                    alert('✅ 第2步完成！\n\n现在执行第3步：找到李四');
+                                    executeGuidanceStep(2);
+                                }, 500);
+                                // 恢复原函数
+                                window.openApp = originalOpenApp;
+                            }
+                        };
+                    }, 500);
+                    break;
+                    
+                case 2:
+                    // 第三步：高亮李四联系人
+                    setTimeout(() => {
+                        const lisiContact = Array.from(document.querySelectorAll('.chat-name')).find(el => el.textContent === '李四');
+                        if (lisiContact) {
+                            const chatItem = lisiContact.closest('.chat-item');
+                            chatItem.style.border = '3px solid #ff6b35';
+                            chatItem.style.borderRadius = '10px';
+                            chatItem.style.animation = 'pulse 1s infinite';
+                        }
+                        
+                        alert('✅ 第3步：请点击闪烁的李四联系人');
+                        
+                        // 监听李四聊天打开
+                        const originalOpenChat = window.openChat;
+                        window.openChat = function(name, avatar) {
+                            originalOpenChat(name, avatar);
+                            if (name === '李四') {
+                                // 恢复李四联系人样式
+                                if (lisiContact) {
+                                    const chatItem = lisiContact.closest('.chat-item');
+                                    chatItem.style.border = '';
+                                    chatItem.style.borderRadius = '';
+                                    chatItem.style.animation = '';
+                                }
+                                setTimeout(() => {
+                                    alert('✅ 第3步完成！\n\n现在执行第4步：点击红包按钮');
+                                    executeGuidanceStep(3);
+                                }, 500);
+                                // 恢复原函数
+                                window.openChat = originalOpenChat;
+                            }
+                        };
+                    }, 500);
+                    break;
+                    
+                case 3:
+                    // 第四步：高亮红包按钮
+                    setTimeout(() => {
+                        const redPacketBtn = document.querySelector('[onclick="showRedPacketModal()"]');
+                        if (redPacketBtn) {
+                            redPacketBtn.style.border = '3px solid #ff6b35';
+                            redPacketBtn.style.borderRadius = '50%';
+                            redPacketBtn.style.animation = 'pulse 1s infinite';
+                        }
+                        
+                        alert('✅ 第4步：请点击闪烁的红包按钮🧧');
+                        
+                        // 监听红包弹窗打开
+                        const originalShowRedPacketModal = window.showRedPacketModal;
+                        window.showRedPacketModal = function() {
+                            originalShowRedPacketModal();
+                            // 恢复红包按钮样式
+                            if (redPacketBtn) {
+                                redPacketBtn.style.border = '';
+                                redPacketBtn.style.borderRadius = '';
+                                redPacketBtn.style.animation = '';
+                            }
+                            setTimeout(() => {
+                                alert('✅ 第4步完成！\n\n现在执行第5步：输入金额5.00');
+                                executeGuidanceStep(4);
+                            }, 500);
+                            // 恢复原函数
+                            window.showRedPacketModal = originalShowRedPacketModal;
+                        };
+                    }, 500);
+                    break;
+                    
+                case 4:
+                    // 第五步：自动填入金额并高亮
+                    setTimeout(() => {
+                        const moneyInput = document.getElementById('moneyInput');
+                        if (moneyInput) {
+                            moneyInput.value = '5.00';
+                            moneyInput.style.border = '3px solid #ff6b35';
+                            moneyInput.style.animation = 'pulse 1s infinite';
+                        }
+                        
+                        alert('✅ 第5步完成！金额已自动填入\n\n现在执行第6步：点击发送按钮');
+                        executeGuidanceStep(5);
+                    }, 500);
+                    break;
+                    
+                case 5:
+                    // 第六步：高亮发送按钮
+                    setTimeout(() => {
+                        const sendBtn = document.querySelector('.modal-btn.confirm');
+                        if (sendBtn) {
+                            sendBtn.style.border = '3px solid #ff6b35';
+                            sendBtn.style.animation = 'pulse 1s infinite';
+                        }
+                        
+                        alert('✅ 第6步：请点击闪烁的"塞钱进红包"按钮');
+                        
+                        // 监听红包发送
+                        const originalSendRedPacket = window.sendRedPacket;
+                        window.sendRedPacket = function() {
+                            originalSendRedPacket();
+                            // 恢复发送按钮样式
+                            if (sendBtn) {
+                                sendBtn.style.border = '';
+                                sendBtn.style.animation = '';
+                            }
+                            // 恢复金额输入框样式
+                            const moneyInput = document.getElementById('moneyInput');
+                            if (moneyInput) {
+                                moneyInput.style.border = '';
+                                moneyInput.style.animation = '';
+                            }
+                            setTimeout(() => {
+                                alert('🎉 恭喜！所有步骤已完成！\n\n您已成功给李四发送了5元红包！');
+                                executeGuidanceStep(6);
+                            }, 1000);
+                            // 恢复原函数
+                            window.sendRedPacket = originalSendRedPacket;
+                        };
+                    }, 500);
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
