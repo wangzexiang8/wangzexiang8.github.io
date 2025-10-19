@@ -19,6 +19,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            gap: 30px;
         }
 
         .phone {
@@ -29,6 +30,57 @@
             padding: 15px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             position: relative;
+        }
+
+        /* 亲属手机样式 */
+        .relative-phone {
+            width: 375px;
+            height: 667px;
+            background: #000;
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            display: none;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.5s ease;
+        }
+
+        .relative-phone.show {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* 紧急消息样式 */
+        .emergency-message {
+            background: linear-gradient(135deg, #ff4757 0%, #ff3838 100%);
+            color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(255, 71, 87, 0.3);
+            animation: emergencyPulse 1.5s infinite;
+            display: none;
+        }
+
+        .emergency-message.show {
+            display: block;
+        }
+
+        @keyframes emergencyPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 8px 25px rgba(255, 71, 87, 0.3);
+            }
+            50% { 
+                transform: scale(1.02);
+                box-shadow: 0 12px 35px rgba(255, 71, 87, 0.5);
+            }
         }
 
         .screen {
@@ -549,6 +601,92 @@
             color: #ff6b35;
         }
 
+        .quick-action-btn.debug-action {
+            border-color: #ff3b30;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action-btn.debug-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 59, 48, 0.1), transparent);
+            animation: debugShine 2s infinite;
+        }
+
+        @keyframes debugShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .quick-action-btn.debug-action .action-title {
+            color: #ff3b30;
+            font-weight: 700;
+        }
+
+        .quick-action-btn.debug-action .action-subtitle {
+            color: #ff6b35;
+            font-weight: 500;
+        }
+
+        .quick-action-btn.debug-action .icon {
+            animation: debugPulse 1.5s infinite;
+        }
+
+        @keyframes debugPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* 远程守望调试按钮样式 */
+        .quick-action-btn.remote-watch-debug-action {
+            border-color: #ff9500;
+            background: linear-gradient(135deg, #fff8f0 0%, #ffedd5 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-action-btn.remote-watch-debug-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 149, 0, 0.15), transparent);
+            animation: remoteWatchShine 2.5s infinite;
+        }
+
+        @keyframes remoteWatchShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .quick-action-btn.remote-watch-debug-action .action-title {
+            color: #ff9500;
+            font-weight: 700;
+        }
+
+        .quick-action-btn.remote-watch-debug-action .action-subtitle {
+            color: #ffb84d;
+            font-weight: 500;
+        }
+
+        .quick-action-btn.remote-watch-debug-action .icon {
+            animation: remoteWatchBounce 2s infinite;
+        }
+
+        @keyframes remoteWatchBounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+            60% { transform: translateY(-4px); }
+        }
+
         /* 智慧引导样式 */
         .smart-guide-content {
             padding: 30px 20px;
@@ -1062,6 +1200,18 @@
                             <div class="action-title">智慧引导</div>
                             <div class="action-subtitle">语音或文字描述需求</div>
                         </div>
+
+                        <div class="quick-action-btn debug-action" onclick="startSilentGuardDebug()">
+                            <div class="icon">🔧</div>
+                            <div class="action-title">沉默守护调试</div>
+                            <div class="action-subtitle">测试4小时未亮屏检测</div>
+                        </div>
+
+                        <div class="quick-action-btn remote-watch-debug-action" onclick="startRemoteWatchDebug()">
+                            <div class="icon">📹</div>
+                            <div class="action-title">远程守望调试</div>
+                            <div class="action-subtitle">测试摔跤检测与紧急呼叫</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1147,6 +1297,61 @@
                             <button class="video-btn mute" onclick="toggleMute()" id="muteBtn">🔇</button>
                             <button class="video-btn hangup" onclick="endVideoCall()">📞</button>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 亲属手机界面 -->
+    <div class="relative-phone" id="relativePhone">
+        <div class="screen">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>⚡ 98%</span>
+            </div>
+
+            <div class="home-screen" style="padding-top: 80px;">
+                <div style="text-align: center; color: #fff; margin-bottom: 30px;">
+                    <h2 style="font-size: 24px; margin-bottom: 10px;">👨‍👩‍👧‍👦 亲属手机</h2>
+                    <p style="font-size: 16px; opacity: 0.8;">张女士的手机</p>
+                </div>
+
+                <!-- 紧急消息区域 -->
+                <div class="emergency-message" id="emergencyMessage">
+                    <div style="font-size: 24px; margin-bottom: 10px;">🚨 紧急通知</div>
+                    <div style="font-size: 20px; font-weight: 700; margin-bottom: 15px;">老人疑似摔倒</div>
+                    <div style="font-size: 16px; margin-bottom: 20px;">请及时确认老人安全状况</div>
+                    <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px; font-size: 14px;">
+                        <div>📍 位置：家中客厅</div>
+                        <div>⏰ 时间：刚刚</div>
+                        <div>📱 来源：智能手表监测</div>
+                    </div>
+                </div>
+
+                <!-- 模拟短信界面 -->
+                <div style="background: rgba(255,255,255,0.1); border-radius: 15px; padding: 20px; margin: 20px; color: #fff;">
+                    <div style="display: flex; align-items: center; margin-bottom: 15px;">
+                        <div style="font-size: 24px; margin-right: 10px;">💬</div>
+                        <div>
+                            <div style="font-weight: 600;">短信</div>
+                            <div style="font-size: 14px; opacity: 0.8;">智能监护系统</div>
+                        </div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px; font-size: 14px;">
+                        "您好，您的家人可能需要帮助。智能手表检测到异常活动，建议您及时联系确认安全。"
+                    </div>
+                </div>
+
+                <!-- 快捷操作按钮 -->
+                <div style="display: flex; gap: 15px; margin: 20px; justify-content: center;">
+                    <div style="background: #34c759; color: #fff; padding: 15px 20px; border-radius: 25px; text-align: center; flex: 1; cursor: pointer;">
+                        <div style="font-size: 20px;">📞</div>
+                        <div style="font-size: 12px; margin-top: 5px;">立即拨打</div>
+                    </div>
+                    <div style="background: #007aff; color: #fff; padding: 15px 20px; border-radius: 25px; text-align: center; flex: 1; cursor: pointer;">
+                        <div style="font-size: 20px;">📍</div>
+                        <div style="font-size: 12px; margin-top: 5px;">查看位置</div>
                     </div>
                 </div>
             </div>
@@ -1784,6 +1989,109 @@
                     }, 500);
                     break;
             }
+        }
+
+        // 沉默守护调试功能
+        function startSilentGuardDebug() {
+            // 第1步：弹出调试开始提示
+            alert('🔧 沉默守护调试开始');
+            
+            // 第2步：延迟1秒后弹出监测提示
+            setTimeout(() => {
+                alert('⚠️ 监测到老人手机超过4h未亮屏，已开始震动提示');
+                
+                // 模拟震动效果（在支持的设备上）
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200, 100, 200]);
+                }
+                
+                // 第3步：延迟2秒后调用拨号功能
+                setTimeout(() => {
+                    // 关闭银龄守护应用
+                    document.getElementById('elderCareApp').classList.remove('active');
+                    // 打开电话应用
+                    document.getElementById('phoneApp').classList.add('active');
+                    // 自动输入120号码
+                    phoneNumber = '120';
+                    document.getElementById('phoneDisplay').textContent = phoneNumber;
+                    
+                    // 自动拨打120
+                    setTimeout(() => {
+                        alert('📞 紧急拨打120急救电话:\n120');
+                        phoneNumber = '';
+                        document.getElementById('phoneDisplay').textContent = '-';
+                        
+                        // 第4步：延迟1秒后显示调试结束并返回银龄守护
+                        setTimeout(() => {
+                            alert('✅ 调试结束');
+                            // 关闭电话应用，返回银龄守护应用
+                            document.getElementById('phoneApp').classList.remove('active');
+                            document.getElementById('elderCareApp').classList.add('active');
+                        }, 1000);
+                        
+                    }, 500);
+                    
+                }, 2000);
+                
+            }, 1000);
+        }
+
+        // 远程守望调试功能
+        function startRemoteWatchDebug() {
+            // 第1步：弹出调试开始提示并显示亲属手机界面
+            alert('📹 远程守望调试开始');
+            
+            // 显示亲属手机界面
+            const relativePhone = document.getElementById('relativePhone');
+            relativePhone.classList.add('show');
+            
+            // 第2步：延迟1秒后弹出摔跤检测提示
+            setTimeout(() => {
+                alert('⚠️ 监测到老人有摔跤行为，已开始提示');
+                
+                // 第3步：延迟1.5秒后弹出短信通知提示
+                setTimeout(() => {
+                    alert('📱 已经通过短信告知家属');
+                    
+                    // 在亲属手机界面显示紧急消息
+                    const emergencyMessage = document.getElementById('emergencyMessage');
+                    emergencyMessage.classList.add('show');
+                    
+                    // 第4步：延迟2秒后调用拨号功能
+                    setTimeout(() => {
+                        // 关闭银龄守护应用
+                        document.getElementById('elderCareApp').classList.remove('active');
+                        // 打开电话应用
+                        document.getElementById('phoneApp').classList.add('active');
+                        // 自动输入120号码
+                        phoneNumber = '120';
+                        document.getElementById('phoneDisplay').textContent = phoneNumber;
+                        
+                        // 自动拨打120
+                        setTimeout(() => {
+                            alert('📞 紧急拨打120急救电话:\n120');
+                            phoneNumber = '';
+                            document.getElementById('phoneDisplay').textContent = '-';
+                            
+                            // 第5步：延迟1秒后显示调试结束并返回银龄守护
+                            setTimeout(() => {
+                                alert('✅ 调试结束');
+                                // 关闭电话应用，返回银龄守护应用
+                                document.getElementById('phoneApp').classList.remove('active');
+                                document.getElementById('elderCareApp').classList.add('active');
+                                
+                                // 隐藏亲属手机界面和紧急消息
+                                relativePhone.classList.remove('show');
+                                emergencyMessage.classList.remove('show');
+                            }, 1000);
+                            
+                        }, 500);
+                        
+                    }, 2000);
+                    
+                }, 1500);
+                
+            }, 1000);
         }
     </script>
 </body>
